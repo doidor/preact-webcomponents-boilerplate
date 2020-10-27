@@ -1,6 +1,8 @@
 const path = require('path');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (_env, argv) => {
 	const { mode } = argv;
@@ -9,8 +11,8 @@ module.exports = (_env, argv) => {
 		entry: './src/index.js',
 		output: {
 			filename: 'main.js',
-            path: path.resolve(__dirname, 'dist'),
-        },
+			path: path.resolve(__dirname, 'dist'),
+		},
 		module: {
 			rules: [
 				{
@@ -19,17 +21,28 @@ module.exports = (_env, argv) => {
 					use: {
 						loader: 'babel-loader',
 						options: {
-							presets: [
-								'@babel/preset-env',
-							],
-							plugins: [
-								"@babel/transform-runtime"
-							]
-						}
-					}
-				}
-			]
-        },
+							presets: ['@babel/preset-env'],
+							plugins: ['@babel/transform-runtime'],
+						},
+					},
+				},
+				{
+					test: /\.(png|jpg|gif)$/,
+					use: [
+						{
+							loader: 'file-loader',
+							options: {
+								name: '[name].[ext]',
+							},
+						},
+					],
+				},
+				{
+					test: /\.css$/,
+					use: [MiniCssExtractPlugin.loader, 'css-loader'],
+				},
+			],
+		},
 	};
 
 	switch (mode) {
@@ -37,27 +50,27 @@ module.exports = (_env, argv) => {
 			config = {
 				...config,
 				mode: 'development',
-                watch: true,
-                devServer: {
-                    contentBase: './dist',
-                    open: true
-                },
-                devtool: 'inline-source-map',
-                plugins: [
-                    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
-                    new HtmlWebpackPlugin({
-                      template: path.resolve(__dirname, 'index.html'),
-                    }),
-                ]
-			}
-		break;
+				watch: true,
+				devServer: {
+					contentBase: './dist',
+					open: true,
+				},
+				devtool: 'inline-source-map',
+				plugins: [
+					new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+					new HtmlWebpackPlugin({
+						template: path.resolve(__dirname, 'index.html'),
+					}),
+				],
+			};
+			break;
 
 		case 'production':
 			config = {
 				...config,
 				mode: 'production',
-			}
-		break;
+			};
+			break;
 	}
 
 	return config;
