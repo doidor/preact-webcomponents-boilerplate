@@ -3,6 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (_env, argv) => {
 	const { mode } = argv;
@@ -43,6 +44,15 @@ module.exports = (_env, argv) => {
 				},
 			],
 		},
+		plugins: [
+			new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+			new HtmlWebpackPlugin({
+				template: path.resolve(__dirname, 'index.html'),
+			}),
+			new CopyPlugin({
+				patterns: [{ from: 'public', to: 'public' }],
+			}),
+		],
 	};
 
 	switch (mode) {
@@ -56,12 +66,6 @@ module.exports = (_env, argv) => {
 					open: true,
 				},
 				devtool: 'inline-source-map',
-				plugins: [
-					new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
-					new HtmlWebpackPlugin({
-						template: path.resolve(__dirname, 'index.html'),
-					}),
-				],
 			};
 			break;
 
